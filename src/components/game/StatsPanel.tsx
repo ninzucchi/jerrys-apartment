@@ -30,12 +30,15 @@ function StatRow({
       <div
         className={`${iconBg} flex items-center justify-center w-14 h-14 border-r-2 border-indigo-800`}
       >
-        <span className="text-xl font-bold">{icon}</span>
+        <span className="text-sm font-bold">{icon}</span>
       </div>
       <div
-        className={`flex-1 flex items-center justify-center ${textColor} font-bold text-2xl font-mono tabular-nums bg-zinc-900 px-3`}
+        className="flex-1 flex items-center justify-center font-bold text-base tabular-nums bg-zinc-900 px-2"
       >
-        {max !== undefined ? `${value} / ${max}` : value}
+        <span className={textColor}>{value}</span>
+        {max !== undefined && (
+          <span className="text-gray-500">&nbsp;/ {max}</span>
+        )}
       </div>
     </div>
   );
