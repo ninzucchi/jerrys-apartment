@@ -599,3 +599,4 @@ export const MAX_EXPANSION_COST = 12;
 export const INITIAL_POPULARITY_CAP = 65;
 export const INITIAL_CASH_CAP = 30;
 export const UNPAID_GUEST_PENALTY = -7; // Popularity penalty per unpaid guest
+export const PARTY_POOL_SIZE = 10; // Random guests drawn per party (on top of defaults)

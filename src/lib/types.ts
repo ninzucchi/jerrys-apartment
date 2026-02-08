@@ -151,6 +151,7 @@ export type PartyAction =
 export type SelectableItem =
   | { kind: "guest"; guest: Guest }
   | { kind: "front_door" }
+  | { kind: "rolodex" }
   | { kind: "none" };
 
 /** The complete game state at any point in time. */
@@ -204,6 +205,8 @@ export interface GameState {
   caption: string;
   /** Stars earned so far in this party (count of star guests present). */
   starsInHouse: number;
+  /** Whether the Rolodex viewer is open (replaces party scene). */
+  rolodexOpen: boolean;
 
   // --- Turns ---
   turnsRemaining: number;
@@ -224,4 +227,5 @@ export type GameAction =
   | { type: "EXPAND_HOUSE" }
   | { type: "END_SHOP" } // Move to next party
   | { type: "NEXT_SCENARIO" }
+  | { type: "TOGGLE_ROLODEX" }
   | { type: "DISMISS" }; // Dismiss results screen, etc.

@@ -16,6 +16,7 @@ import {
   INITIAL_EXPANSION_COST,
   INITIAL_POPULARITY_CAP,
   INITIAL_CASH_CAP,
+  PARTY_POOL_SIZE,
 } from "./constants";
 
 // ============================================================
@@ -42,7 +43,8 @@ export function createGuestInstance(type: GuestType): Guest {
   };
 }
 
-function buildInitialRolodex(): Guest[] {
+/** Build the default loadout guests (Old Friends, Rich Pals, Wild Buddies). */
+function buildDefaultGuests(): Guest[] {
   const guests: Guest[] = [];
   for (const entry of DEFAULT_ROLODEX) {
     for (let i = 0; i < entry.quantity; i++) {
@@ -50,6 +52,25 @@ function buildInitialRolodex(): Guest[] {
     }
   }
   return guests;
+}
+
+/**
+ * Build a party pool of exactly PARTY_POOL_SIZE guests.
+ * Draws randomly from the full set of non-star guest types.
+ */
+function buildPartyPool(): Guest[] {
+  // All non-star guest types (includes defaults like old_friend, wild_buddy, etc.)
+  const allTypes: GuestType[] = Object.values(GUEST_DEFINITIONS)
+    .filter((g) => !g.isStar)
+    .map((g) => g.type);
+
+  const shuffledTypes = shuffle(allTypes);
+  const pickedTypes = shuffledTypes.slice(
+    0,
+    Math.min(PARTY_POOL_SIZE, shuffledTypes.length)
+  );
+
+  return pickedTypes.map((t) => createGuestInstance(t));
 }
 
 /** Fisher-Yates shuffle (returns new array). */
@@ -76,7 +97,7 @@ function countStars(guests: Guest[]): number {
 
 export function createInitialState(scenarioIndex: number = 0): GameState {
   const scenario = SCENARIOS[scenarioIndex];
-  const rolodex = buildInitialRolodex();
+  const rolodex = buildPartyPool();
 
   return {
     phase: "party",
@@ -94,7 +115,7 @@ export function createInitialState(scenarioIndex: number = 0): GameState {
     guestsInHouse: [],
 
     rolodex,
-    drawPile: shuffle(rolodex.filter((g) => !g.banned)),
+    drawPile: shuffle([...rolodex]),
 
     starsRequired: STARS_REQUIRED,
     scenarioStarTypes: scenario.starTypes,
@@ -108,13 +129,14 @@ export function createInitialState(scenarioIndex: number = 0): GameState {
     selectedItem: { kind: "front_door" },
     caption: "GET THIS PARTY STARTED!",
     starsInHouse: 0,
+    rolodexOpen: false,
 
     turnsRemaining: MAX_PARTIES_PER_SCENARIO,
   };
 }
 
 // ============================================================
-// Reducer (placeholder – game logic will be fleshed out later)
+// Reducer
 // ============================================================
 
 export function gameReducer(
@@ -126,7 +148,7 @@ export function gameReducer(
       return createInitialState(0);
 
     case "OPEN_DOOR": {
-      if (state.phase !== "party") return state;
+      if (state.phase !== "party" || state.rolodexOpen) return state;
       if (state.guestsInHouse.length >= state.houseSize) {
         return { ...state, caption: "THE PARTY IS FULL." };
       }
@@ -149,7 +171,6 @@ export function gameReducer(
           starsInHouse: stars,
           phase: "shutdown",
           caption: "OH NO! THE COPS HAVE SHOWN UP! WHO GETS THE BLAME?",
-          // Auto-select first guest for keyboard ban navigation
           selectedItem: { kind: "guest", guest: newGuests[0] },
         };
       }
@@ -175,7 +196,7 @@ export function gameReducer(
     }
 
     case "END_PARTY": {
-      if (state.phase !== "party") return state;
+      if (state.phase !== "party" || state.rolodexOpen) return state;
 
       // Check win condition: 4 stars present
       if (state.starsInHouse >= state.starsRequired) {
@@ -183,6 +204,7 @@ export function gameReducer(
           ...state,
           phase: "scenario_won",
           caption: "YOU WIN! THE PARTY WAS LEGENDARY!",
+          rolodexOpen: false,
         };
       }
 
@@ -206,6 +228,7 @@ export function gameReducer(
         popularity: Math.max(0, newPop),
         cash: Math.max(0, newCash),
         caption: `YOU HAVE ENDED THE PARTY. +${popGain} POP, +${cashGain} CASH`,
+        rolodexOpen: false,
       };
     }
 
@@ -215,8 +238,32 @@ export function gameReducer(
         selectedItem: action.item,
       };
 
+    case "TOGGLE_ROLODEX": {
+      if (state.phase !== "party") return state;
+
+      const opening = !state.rolodexOpen;
+      if (opening) {
+        // Open rolodex: select the close/back button (first grid item)
+        return {
+          ...state,
+          rolodexOpen: true,
+          selectedItem: { kind: "rolodex" },
+          caption: "CONTACTS",
+        };
+      } else {
+        // Close rolodex: restore selection to front door
+        return {
+          ...state,
+          rolodexOpen: false,
+          selectedItem: { kind: "front_door" },
+          caption: state.guestsInHouse.length > 0
+            ? `PARTY IN PROGRESS. ${state.guestsInHouse.length} GUESTS.`
+            : "GET THIS PARTY STARTED!",
+        };
+      }
+    }
+
     case "BAN_GUEST": {
-      // After a shutdown, ban one guest from next party
       const updatedRolodex = state.rolodex.map((g) =>
         g.id === action.guestId ? { ...g, banned: true } : g
       );
@@ -229,9 +276,7 @@ export function gameReducer(
     }
 
     case "DISMISS": {
-      // After party_ended, move to shop or next party
       if (state.phase === "party_ended") {
-        // For now, go directly to the next party
         const nextPartyNum = state.partyNumber + 1;
         if (nextPartyNum > state.maxParties) {
           return {
@@ -241,13 +286,15 @@ export function gameReducer(
           };
         }
 
-        const availableGuests = state.rolodex.filter((g) => !g.banned);
+        // Build a fresh party pool for the next party
+        const newPool = buildPartyPool();
         return {
           ...state,
           phase: "party",
           partyNumber: nextPartyNum,
           guestsInHouse: [],
-          drawPile: shuffle(availableGuests),
+          rolodex: newPool,
+          drawPile: shuffle([...newPool]),
           activeTroubleCount: 0,
           starsInHouse: 0,
           currentAction: "idle",
@@ -255,6 +302,7 @@ export function gameReducer(
           selectedItem: { kind: "front_door" },
           caption: `PARTY ${nextPartyNum} OF ${state.maxParties}. LET'S GO!`,
           turnsRemaining: state.maxParties - nextPartyNum + 1,
+          rolodexOpen: false,
         };
       }
       return state;

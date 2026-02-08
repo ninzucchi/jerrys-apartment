@@ -31,6 +31,10 @@ export function useGameState() {
     dispatch({ type: "START_GAME" });
   }, []);
 
+  const toggleRolodex = useCallback(() => {
+    dispatch({ type: "TOGGLE_ROLODEX" });
+  }, []);
+
   const dispatchAction = useCallback(
     (action: GameAction) => dispatch(action),
     []
@@ -44,6 +48,7 @@ export function useGameState() {
     banGuest,
     dismiss,
     startGame,
+    toggleRolodex,
     dispatch: dispatchAction,
   };
 }

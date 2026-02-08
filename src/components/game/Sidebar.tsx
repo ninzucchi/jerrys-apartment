@@ -9,16 +9,20 @@ interface SidebarProps {
   state: GameState;
   onOpenDoor: () => void;
   onEndParty: () => void;
+  onToggleRolodex: () => void;
 }
 
-export function Sidebar({ state, onOpenDoor, onEndParty }: SidebarProps) {
+export function Sidebar({ state, onOpenDoor, onEndParty, onToggleRolodex }: SidebarProps) {
   const canOpenDoor =
     state.phase === "party" &&
+    !state.rolodexOpen &&
     state.guestsInHouse.length < state.houseSize &&
     state.drawPile.length > 0;
 
   const canEndParty =
-    state.phase === "party" && state.guestsInHouse.length > 0;
+    state.phase === "party" &&
+    !state.rolodexOpen &&
+    state.guestsInHouse.length > 0;
 
   // Compute live stats from guests currently in the house
   const livePartyPop = useMemo(
@@ -51,9 +55,11 @@ export function Sidebar({ state, onOpenDoor, onEndParty }: SidebarProps) {
         selectedItem={state.selectedItem}
         onOpenDoor={onOpenDoor}
         onEndParty={onEndParty}
+        onToggleRolodex={onToggleRolodex}
         canOpenDoor={canOpenDoor}
         canEndParty={canEndParty}
         phase={state.phase}
+        rolodexOpen={state.rolodexOpen}
       />
     </div>
   );

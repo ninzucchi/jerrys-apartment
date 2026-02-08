@@ -7,9 +7,11 @@ interface InfoPanelProps {
   selectedItem: SelectableItem;
   onOpenDoor: () => void;
   onEndParty: () => void;
+  onToggleRolodex: () => void;
   canOpenDoor: boolean;
   canEndParty: boolean;
   phase: string;
+  rolodexOpen: boolean;
 }
 
 function GuestInfo({ guest }: { guest: Guest }) {
@@ -152,13 +154,42 @@ function getAbilityDescription(ability: string): string {
   return descriptions[ability] || ability.toUpperCase();
 }
 
+function RolodexInfo({
+  onToggleRolodex,
+  isOpen,
+}: {
+  onToggleRolodex: () => void;
+  isOpen: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-lg font-bold uppercase tracking-wide text-center text-white">
+        {isOpen ? "EXIT" : "ROLODEX"}
+      </h3>
+      <div className="border-2 border-white bg-black p-3 space-y-2">
+        <button
+          onClick={onToggleRolodex}
+          className="w-full text-left font-bold text-sm py-1 text-white hover:text-yellow-300 cursor-pointer"
+        >
+          <span className="inline-block w-6 h-6 bg-yellow-600 text-black text-center text-xs leading-6 mr-2 align-middle">
+            X
+          </span>
+          :{isOpen ? "CLOSE ROLODEX" : "OPEN ROLODEX"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function InfoPanel({
   selectedItem,
   onOpenDoor,
   onEndParty,
+  onToggleRolodex,
   canOpenDoor,
   canEndParty,
   phase,
+  rolodexOpen,
 }: InfoPanelProps) {
   // Shutdown phase: show guest info + ban prompt
   if (phase === "shutdown") {
@@ -187,8 +218,24 @@ export function InfoPanel({
     );
   }
 
+  // Rolodex open: guest info or exit prompt
+  if (rolodexOpen) {
+    return (
+      <div className="min-h-[160px]">
+        {selectedItem.kind === "guest" ? (
+          <GuestInfo guest={selectedItem.guest} />
+        ) : (
+          <RolodexInfo onToggleRolodex={onToggleRolodex} isOpen />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[160px]">
+      {selectedItem.kind === "rolodex" && (
+        <RolodexInfo onToggleRolodex={onToggleRolodex} isOpen={false} />
+      )}
       {selectedItem.kind === "front_door" && (
         <FrontDoorInfo
           onOpenDoor={onOpenDoor}

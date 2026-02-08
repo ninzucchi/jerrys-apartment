@@ -2,6 +2,7 @@
 
 import { GameState, Guest } from "@/lib/types";
 import { PartyScene } from "./PartyScene";
+import { RolodexView } from "./RolodexView";
 import { Sidebar } from "./Sidebar";
 import { CaptionBar } from "./CaptionBar";
 
@@ -9,8 +10,10 @@ interface GameLayoutProps {
   state: GameState;
   onOpenDoor: () => void;
   onEndParty: () => void;
+  onToggleRolodex: () => void;
   onSelectGuest: (guest: Guest) => void;
   onSelectDoor: () => void;
+  onSelectRolodex: () => void;
   onDismiss: () => void;
 }
 
@@ -18,8 +21,10 @@ export function GameLayout({
   state,
   onOpenDoor,
   onEndParty,
+  onToggleRolodex,
   onSelectGuest,
   onSelectDoor,
+  onSelectRolodex,
   onDismiss,
 }: GameLayoutProps) {
   const isWarningCaption =
@@ -38,16 +43,27 @@ export function GameLayout({
       <div className="grid grid-cols-[1fr_220px] h-full">
         {/* Left column: scene + caption */}
         <div className="flex flex-col">
-          {/* Party scene takes most of the space */}
+          {/* Party scene or Rolodex view */}
           <div className="flex-1 relative">
-            <PartyScene
-              guestsInHouse={state.guestsInHouse}
-              houseSize={state.houseSize}
-              selectedItem={state.selectedItem}
-              onSelectGuest={onSelectGuest}
-              onSelectDoor={onSelectDoor}
-              phase={state.phase}
-            />
+            {state.rolodexOpen ? (
+              <RolodexView
+                guests={state.rolodex}
+                selectedItem={state.selectedItem}
+                onSelectGuest={onSelectGuest}
+                onClose={onToggleRolodex}
+                onSelectClose={() => onSelectRolodex()}
+              />
+            ) : (
+              <PartyScene
+                guestsInHouse={state.guestsInHouse}
+                houseSize={state.houseSize}
+                selectedItem={state.selectedItem}
+                onSelectGuest={onSelectGuest}
+                onSelectDoor={onSelectDoor}
+                onSelectRolodex={onSelectRolodex}
+                phase={state.phase}
+              />
+            )}
           </div>
           {/* Caption bar at bottom */}
           <CaptionBar caption={state.caption} isWarning={isWarningCaption} />
@@ -59,6 +75,7 @@ export function GameLayout({
             state={state}
             onOpenDoor={onOpenDoor}
             onEndParty={onEndParty}
+            onToggleRolodex={onToggleRolodex}
           />
         </div>
       </div>

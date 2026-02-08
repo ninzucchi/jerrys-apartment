@@ -7,8 +7,15 @@ import { GameLayout } from "@/components/game/GameLayout";
 import { Guest } from "@/lib/types";
 
 export default function Home() {
-  const { state, openDoor, endParty, selectItem, banGuest, dismiss } =
-    useGameState();
+  const {
+    state,
+    openDoor,
+    endParty,
+    selectItem,
+    banGuest,
+    dismiss,
+    toggleRolodex,
+  } = useGameState();
 
   const handleSelectGuest = (guest: Guest) => {
     selectItem({ kind: "guest", guest });
@@ -18,11 +25,22 @@ export default function Home() {
     selectItem({ kind: "front_door" });
   };
 
+  const handleSelectRolodex = () => {
+    selectItem({ kind: "rolodex" });
+  };
+
   // Memoize the actions object so the keyboard hook doesn't
   // re-register on every render
   const keyboardActions = useMemo(
-    () => ({ openDoor, endParty, selectItem, dismiss, banGuest }),
-    [openDoor, endParty, selectItem, dismiss, banGuest]
+    () => ({
+      openDoor,
+      endParty,
+      selectItem,
+      dismiss,
+      banGuest,
+      toggleRolodex,
+    }),
+    [openDoor, endParty, selectItem, dismiss, banGuest, toggleRolodex]
   );
 
   useKeyboardNavigation(state, keyboardActions);
@@ -36,8 +54,10 @@ export default function Home() {
         state={state}
         onOpenDoor={openDoor}
         onEndParty={endParty}
+        onToggleRolodex={toggleRolodex}
         onSelectGuest={handleSelectGuest}
         onSelectDoor={handleSelectDoor}
+        onSelectRolodex={handleSelectRolodex}
         onDismiss={dismiss}
       />
       <p className="text-gray-600 text-[10px] mt-4 tracking-wider">

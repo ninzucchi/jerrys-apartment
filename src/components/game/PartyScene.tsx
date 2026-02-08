@@ -9,6 +9,7 @@ interface PartySceneProps {
   selectedItem: SelectableItem;
   onSelectGuest: (guest: Guest) => void;
   onSelectDoor: () => void;
+  onSelectRolodex: () => void;
   phase: string;
 }
 
@@ -18,6 +19,7 @@ export function PartyScene({
   selectedItem,
   onSelectGuest,
   onSelectDoor,
+  onSelectRolodex,
   phase,
 }: PartySceneProps) {
   const isParty = phase === "party";
@@ -55,10 +57,26 @@ export function PartyScene({
         {/* Floor line */}
         <div className="absolute inset-x-4 top-0 h-[2px] bg-[#3D2060]" />
 
+        {/* Rolodex (to the left of the door) */}
+        <button
+          onClick={onSelectRolodex}
+          className={`absolute left-2 top-2 w-7 h-5 cursor-pointer flex items-center justify-center ${
+            selectedItem.kind === "rolodex"
+              ? "ring-2 ring-yellow-400"
+              : "hover:ring-2 hover:ring-white/40"
+          }`}
+          style={{ backgroundColor: "#5C2D0E" }}
+          title="Rolodex"
+        >
+          <span className="text-[6px] text-amber-200 font-bold leading-none">
+            ROL
+          </span>
+        </button>
+
         {/* Front door */}
         <button
           onClick={onSelectDoor}
-          className={`absolute left-6 top-0 -translate-y-1/2 w-8 h-14 cursor-pointer ${
+          className={`absolute left-12 top-0 -translate-y-1/2 w-8 h-14 cursor-pointer ${
             selectedItem.kind === "front_door"
               ? "ring-2 ring-yellow-400"
               : "hover:ring-2 hover:ring-white/40"
