@@ -52,43 +52,46 @@ export function PartyScene({
         </div>
       </div>
 
-      {/* Interior floor (where guests stand) */}
+      {/* Interior floor – unified grid of all interactable items */}
       <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[#1A0A2E]">
         {/* Floor line */}
         <div className="absolute inset-x-4 top-0 h-[2px] bg-[#3D2060]" />
 
-        {/* Rolodex (to the left of the door) */}
-        <button
-          onClick={onSelectRolodex}
-          className={`absolute left-2 top-2 w-7 h-5 cursor-pointer flex items-center justify-center ${
-            selectedItem.kind === "rolodex"
-              ? "ring-2 ring-yellow-400"
-              : "hover:ring-2 hover:ring-white/40"
-          }`}
-          style={{ backgroundColor: "#5C2D0E" }}
-          title="Rolodex"
-        >
-          <span className="text-[6px] text-amber-200 font-bold leading-none">
-            ROL
-          </span>
-        </button>
+        <div className="flex flex-wrap items-end gap-1 p-2">
+          {/* Rolodex cell */}
+          <button
+            onClick={onSelectRolodex}
+            className={`w-10 h-14 flex flex-col items-center justify-center cursor-pointer border-2 rounded-t-sm ${
+              selectedItem.kind === "rolodex"
+                ? "border-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.5)]"
+                : "border-transparent hover:border-white/40"
+            }`}
+            style={{ backgroundColor: "#5C2D0E" }}
+            title="Rolodex"
+          >
+            <span className="text-[7px] text-amber-200 font-bold leading-tight text-center">
+              ROL
+            </span>
+          </button>
 
-        {/* Front door */}
-        <button
-          onClick={onSelectDoor}
-          className={`absolute left-12 top-0 -translate-y-1/2 w-8 h-14 cursor-pointer ${
-            selectedItem.kind === "front_door"
-              ? "ring-2 ring-yellow-400"
-              : "hover:ring-2 hover:ring-white/40"
-          }`}
-          style={{ backgroundColor: "#2D5A27" }}
-          title="Front Door"
-        >
-          <div className="absolute top-1/2 right-1 w-1.5 h-1.5 rounded-full bg-yellow-600" />
-        </button>
+          {/* Front door cell */}
+          <button
+            onClick={onSelectDoor}
+            className={`w-10 h-14 flex flex-col items-center justify-center cursor-pointer border-2 rounded-t-sm ${
+              selectedItem.kind === "front_door"
+                ? "border-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.5)]"
+                : "border-transparent hover:border-white/40"
+            }`}
+            style={{ backgroundColor: "#2D5A27" }}
+            title="Front Door"
+          >
+            <span className="text-[7px] text-green-200 font-bold leading-tight text-center">
+              DOOR
+            </span>
+            <div className="w-1.5 h-1.5 rounded-full bg-yellow-600 mt-1" />
+          </button>
 
-        {/* Guest slots */}
-        <div className="flex flex-wrap items-end gap-1 px-16 pt-3 pb-2">
+          {/* Guest cells */}
           {guestsInHouse.map((guest) => (
             <GuestSprite
               key={guest.id}
@@ -100,6 +103,7 @@ export function PartyScene({
               onClick={() => onSelectGuest(guest)}
             />
           ))}
+
           {/* Empty slots */}
           {isParty &&
             Array.from({
@@ -112,10 +116,6 @@ export function PartyScene({
             ))}
         </div>
       </div>
-
-      {/* Furniture decorations */}
-      <div className="absolute left-2 bottom-[50%] w-8 h-6 bg-[#5C2D0E] border border-[#3D1F08]" />
-      <div className="absolute right-8 bottom-[48%] w-14 h-6 bg-[#8B2323] rounded-sm border border-[#5C1616]" />
     </div>
   );
 }

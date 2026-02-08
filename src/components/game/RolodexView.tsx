@@ -33,12 +33,12 @@ export function RolodexView({
       </div>
 
       {/* Grid: close button + guests */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex flex-wrap items-end gap-1">
           {/* Close / back button as the first grid item */}
           <button
             onClick={() => { onSelectClose(); onClose(); }}
-            className={`w-10 h-14 flex flex-col items-center justify-center cursor-pointer border-2 ${
+            className={`w-10 h-14 flex flex-col items-center justify-center cursor-pointer border-2 rounded-t-sm ${
               isCloseSelected
                 ? "border-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.5)]"
                 : "border-white/20 hover:border-white/40"
