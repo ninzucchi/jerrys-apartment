@@ -171,7 +171,6 @@ export function gameReducer(
             ? "PARTY FULL, BUT ACTIONS STILL AVAILABLE."
             : "THE PARTY IS FULL."
           : `${nextGuest.name.toUpperCase()} HAS ARRIVED!`,
-        selectedItem: { kind: "guest", guest: nextGuest },
       };
     }
 
