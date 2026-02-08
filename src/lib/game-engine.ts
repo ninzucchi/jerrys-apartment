@@ -148,7 +148,9 @@ export function gameReducer(
           activeTroubleCount: trouble,
           starsInHouse: stars,
           phase: "shutdown",
-          caption: "OH NO! THE COPS HAVE SHOWN UP!",
+          caption: "OH NO! THE COPS HAVE SHOWN UP! WHO GETS THE BLAME?",
+          // Auto-select first guest for keyboard ban navigation
+          selectedItem: { kind: "guest", guest: newGuests[0] },
         };
       }
 

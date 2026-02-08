@@ -160,6 +160,27 @@ export function InfoPanel({
   canEndParty,
   phase,
 }: InfoPanelProps) {
+  // Shutdown phase: show guest info + ban prompt
+  if (phase === "shutdown") {
+    return (
+      <div className="min-h-[160px]">
+        {selectedItem.kind === "guest" ? (
+          <div className="flex flex-col gap-2">
+            <GuestInfo guest={selectedItem.guest} />
+            <div className="text-center text-xs text-yellow-300 mt-1 font-bold">
+              PRESS X TO BAN
+            </div>
+          </div>
+        ) : (
+          <div className="border-2 border-white bg-black p-4 min-h-[160px] text-center text-xs text-gray-400">
+            USE ARROWS TO SELECT A GUEST TO BAN
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Non-party phases: empty panel
   if (phase !== "party") {
     return (
       <div className="border-2 border-white bg-black p-4 min-h-[160px]" />

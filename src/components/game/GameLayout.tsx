@@ -71,10 +71,10 @@ export function GameLayout({
         >
           <div className="bg-black border-2 border-white px-8 py-4 text-white font-bold text-sm uppercase tracking-wider">
             {state.phase === "scenario_won"
-              ? "🎉 SCENARIO COMPLETE! CLICK TO CONTINUE"
+              ? "SCENARIO COMPLETE! PRESS X TO CONTINUE"
               : state.phase === "scenario_lost"
-              ? "💀 GAME OVER. CLICK TO RESTART"
-              : "CLICK TO CONTINUE"}
+              ? "GAME OVER. PRESS X TO RESTART"
+              : "PRESS X TO CONTINUE"}
           </div>
         </button>
       )}
